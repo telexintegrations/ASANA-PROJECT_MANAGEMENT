@@ -1,3 +1,6 @@
+// Import getProjectAndTasks from projectController
+const { getProjectAndTasks } = require("../controllers/projectController");
+
 const integrationJson = (req, res) => {
     const appData = {
       data: {
@@ -27,7 +30,7 @@ const integrationJson = (req, res) => {
             label: "interval",
             type: "text",
             required: true,
-            default: "* 9 * * *",
+            default: "*/9 * * * *",
           },
           {
             label: "Do you want to continue",
@@ -45,5 +48,24 @@ const integrationJson = (req, res) => {
     res.json(appData);
 };
 
-// Export the function to be used in the router
-module.exports = {integrationJson};
+// Function: process tick request and fetch Asana data
+const processTick = async (req, res, next) => {
+    try {
+        console.log("Received tick request. Fetching Asana projects and tasks...");
+
+        // Call function to fetch and return project & task details
+        await getProjectAndTasks(req, res, next);
+        
+        // Ensure response is only sent once
+        if (!res.headersSent) {
+            res.status(200).json({ message: "Tick processed successfully" });
+        }
+
+    } catch (error) {
+        console.error("Tick processing failed:", error);
+        res.status(500).json({ error: "Failed to process tick" });
+    }
+};
+
+// Export both functions
+module.exports = { integrationJson, processTick };
