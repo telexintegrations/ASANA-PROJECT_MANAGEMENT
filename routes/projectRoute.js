@@ -4,7 +4,7 @@ const express = require("express");
 const router = express.Router();
 // Import the controller function to handle the project and task data retrieval
 const { getProjectAndTasks } = require("../controllers/projectController");
-const { processTick } = require("../controllers/integrationController");
+const { processTick } = require("../services/telexService");
 
 // Route to GET project and task details
 router.route("/").get(getProjectAndTasks);
