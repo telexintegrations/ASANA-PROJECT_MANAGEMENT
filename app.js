@@ -3,6 +3,7 @@ const path = require("path");
 const dotenv = require("dotenv").config();
 const cors = require("cors");  // Import CORS middleware
 const errorHandler = require("./middleware/errorHandler");
+const cronJob = require("./cronJob"); // Import and execute the cron job
 
 const app = express();
 
