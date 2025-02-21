@@ -10,6 +10,10 @@ cron.schedule("*/9 * * * *", async () => {
         const response = await axios.post(tickUrl);
         console.log("Asana sync response:", response.data);
     } catch (error) {
-        console.error("Asana sync failed:", error.message);
+        if (error.response) {
+            console.error("Asana sync failed:", error.response.status, error.response.data);
+        } else {
+            console.error("Asana sync failed:", error.message);
+        }
     }
 });
