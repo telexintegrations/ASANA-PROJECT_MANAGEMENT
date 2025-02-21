@@ -14,11 +14,24 @@ app.use(cors());
 // Middleware to parse JSON requests
 app.use(express.json());
 
+app.use(cors({
+    origin: [
+        "http://staging.telextest.im",
+        "http://telextest.im",
+        "https://staging.telex.im",
+        "https://telex.im"
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}));
+
 // Your project routes for fetching project details
-app.use("/api/projects", require("./routes/projectRoute"));
+app.use("/", require("./routes/projectRoute"));
+app.use("/asana-integration", require("./routes/integrationRoute"));
 
 // Error handler middleware (must be after all routes)
 app.use(errorHandler);
+
 
 // Start the server
 app.listen(port, () => {
