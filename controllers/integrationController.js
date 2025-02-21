@@ -9,7 +9,7 @@ const integrationJson = (req, res) => {
           app_description: "Keep track on projects hosted on Asana",
           app_logo: "https://iili.io/Jcshqe2.webp",
           app_name: "Asana Project Management",
-          app_url: "https://wc20w8pm-3000.uks1.devtunnels.ms/asana-integration",
+          app_url: "https://asana-project-management.onrender.com/asana-integration",
           background_color: "#HEXCODE",
         },
         integration_category: "Project Management",
@@ -36,8 +36,8 @@ const integrationJson = (req, res) => {
             default: "Yes",
           },
         ],
-        tick_url: "https://wc20w8pm-3000.uks1.devtunnels.ms/tick",
-        target_url: "https://wc20w8pm-3000.uks1.devtunnels.ms",
+        tick_url: "https://asana-project-management.onrender.com/tick",
+        target_url: "https://asana-project-management.onrender.com",
       },
     };
   
