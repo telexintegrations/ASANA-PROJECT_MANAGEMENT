@@ -9,11 +9,6 @@ const app = express();
 const port = process.env.PORT;
 
 // Middleware for handling CORS (allow cross-origin requests)
-app.use(cors());
-
-// Middleware to parse JSON requests
-app.use(express.json());
-
 app.use(cors({
     origin: [
         "http://staging.telextest.im",
@@ -24,6 +19,9 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true
 }));
+
+// Middleware to parse JSON requests
+app.use(express.json());
 
 // Your project routes for fetching project details
 app.use("/", require("./routes/projectRoute"));
