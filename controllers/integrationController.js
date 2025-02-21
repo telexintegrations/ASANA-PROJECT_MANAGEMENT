@@ -1,8 +1,3 @@
-// Import axios
-const axios = require("axios");
-// Import getProjectAndTasks from projectController
-const { getProjectAndTasks } = require("../controllers/projectController");
-
 const integrationJson = (req, res) => {
     const appData = {
       data: {
@@ -50,46 +45,5 @@ const integrationJson = (req, res) => {
     res.json(appData);
 };
 
-// Function: process tick request and fetch Asana data
-const processTick = async (req, res, next) => {
-    try {
-        console.log("Received tick request:", JSON.stringify(req.body, null, 2));
-
-        const { channel_id, return_url, settings } = req.body;
-
-        if (!return_url) {
-            console.error("Missing return_url in request");
-            return res.status(400).json({ error: "return_url is required" });
-        }
-
-        console.log(`Processing tick for channel: ${channel_id}`);
-        console.log(`Return URL: ${return_url}`);
-
-        // Fetch Asana project and tasks
-        const asanaData = await getProjectAndTasks(req, res, next);
-
-        // Construct response for Telex
-        const responsePayload = {
-            channelId: channel_id,
-            message: "Telex project update successfully processed.",
-            asanaData,
-            timestamp: new Date().toISOString(),
-        };
-
-        // Send processed data back to Telex
-        const telexResponse = await axios.post(return_url, responsePayload);
-        console.log("Successfully sent response to Telex:", telexResponse.data);
-
-        // Ensure response is only sent once
-        if (!res.headersSent) {
-            res.status(202).json({ message: "Tick processed successfully" });
-        }
-
-    } catch (error) {
-        console.error("Tick processing failed:", error.response ? error.response.data : error.message);
-        res.status(500).json({ error: "Failed to process tick" });
-    }
-};
-
 // Export both functions
-module.exports = { integrationJson, processTick };
+module.exports = { integrationJson };
