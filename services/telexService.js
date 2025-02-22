@@ -16,7 +16,7 @@ const processTick = async (req, res, next) => {
         }
 
         // Fetch Asana project & tasks
-        const asanaData = await getProjectAndTasks(req, res, next);
+        const asanaData = await getProjectAndTasks(req);
 
         if (!asanaData || !asanaData.project) {
             console.error("No project data found.");
