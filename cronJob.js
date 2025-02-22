@@ -3,34 +3,31 @@ const cron = require("node-cron");
 const axios = require("axios");
 require("dotenv").config();
 
-// Load URLs and necessary values from environment variables for flexibility
-const { INTEGRATION_URL, TICK_URL, CRON_FALLBACK_INTERVAL } = process.env;
+// Import integration settings from integrationController.js
+const { integrationJson } = require("./controllers/integrationController");
+
+// Load necessary values from environment variables
+const { TICK_URL, CRON_FALLBACK_INTERVAL } = process.env;
 
 async function fetchInterval() {
     try {
-        // Fetch integration settings from the live server
-        const response = await axios.get(INTEGRATION_URL);
+        // Get the settings directly from integrationJson
+        const appData = integrationJson();
 
-        // Extract the interval value from the settings
-        const interval = response.data.data.settings.find(setting => setting.label === 'interval').default;
+        // Extract the interval value
+        const interval = appData.data.settings.find(setting => setting.label === 'interval').default;
 
-        // Log the fetched interval for debugging
         console.log(`Fetched interval: ${interval}`);
-
         return interval;
     } catch (error) {
-        // Log error if fetching the interval fails
         console.error("Failed to fetch interval:", error.message);
-
-        // Return a fallback interval in case of failure
-        return CRON_FALLBACK_INTERVAL || "*/9 * * * *";  // Default to */9 * * * * if nothing is provided
+        return CRON_FALLBACK_INTERVAL || "*/9 * * * *";  
     }
 }
 
 async function startCronJob() {
-    const interval = await fetchInterval();  // Get the interval to run the cron job
+    const interval = await fetchInterval(); // Get the interval to run the cron job
 
-    // Log the interval for debugging purposes
     console.log(`Cron job will run with interval: ${interval}`);
 
     // Schedule the cron job to run at the fetched interval
@@ -38,7 +35,7 @@ async function startCronJob() {
         console.log("Running Asana sync job...");
 
         try {
-            // Prepare the payload with only necessary settings
+            // Prepare the payload with necessary settings
             const payload = {
                 settings: [
                     {
