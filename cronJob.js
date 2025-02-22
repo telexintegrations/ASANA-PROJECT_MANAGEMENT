@@ -4,7 +4,7 @@ const axios = require("axios");
 require("dotenv").config();
 
 // Load URLs and necessary values from environment variables for flexibility
-const { INTEGRATION_URL, TICK_URL, TELEX_CHANNEL_ID, TELEX_RETURN_URL, CRON_FALLBACK_INTERVAL } = process.env;
+const { INTEGRATION_URL, TICK_URL, CRON_FALLBACK_INTERVAL } = process.env;
 
 async function fetchInterval() {
     try {
@@ -38,10 +38,8 @@ async function startCronJob() {
         console.log("Running Asana sync job...");
 
         try {
-            // Prepare the payload with the required details
+            // Prepare the payload with only necessary settings
             const payload = {
-                channel_id: TELEX_CHANNEL_ID,  // Telex channel ID
-                return_url: TELEX_RETURN_URL,  // The return URL where Telex expects a response
                 settings: [
                     {
                         label: "interval",

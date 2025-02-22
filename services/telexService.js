@@ -1,33 +1,34 @@
-// Import axios
+// Import required modules
 const axios = require("axios");
-
-// Import getProjectAndTasks (already implemented elsewhere)
 const { getProjectAndTasks } = require("../controllers/projectController");
 
-// Retrieve the webhook url from environment variables
-const webHookUrl = process.env.WEBHOOK_URL;
-
-// Function: process tick request and send Asana data to Telex
+// Function: Process tick request and send Asana data to Telex
 const processTick = async (req, res, next) => {
     try {
         console.log("Received tick request. Fetching Asana projects and tasks...");
 
-        // Fetch Asana project & tasks (using the updated function that returns data)
+        // Extract the return_url dynamically from Telex's request
+        const { return_url } = req.body;
+
+        if (!return_url) {
+            console.error("No return_url received from Telex.");
+            return res.status(400).json({ error: "No return_url provided by Telex" });
+        }
+
+        // Fetch Asana project & tasks
         const asanaData = await getProjectAndTasks(req, res, next);
 
-        // Check if the data is valid
         if (!asanaData || !asanaData.project) {
             console.error("No project data found.");
             return res.status(500).json({ error: "No project data found" });
         }
 
-        // Log the fetched data for debugging
         console.log("Fetched Asana Data:", JSON.stringify(asanaData, null, 2));
 
-        // Construct the formatted message for Telex
+        // Extract project and tasks
         const { project, tasks } = asanaData;
 
-        // Format the task list for Telex message
+        // Format the task list
         const tasksList = tasks.map(task => `- ${task.taskName} (Task ID: ${task.taskId})`).join("\n");
 
         // Construct detailed project information
@@ -42,42 +43,39 @@ const processTick = async (req, res, next) => {
         *Due Date:* ${project.dueDate}
         *Archived:* ${project.archived ? "Yes" : "No"}
         *Completed:* ${project.completed ? "Yes" : "No"}
-        *Permalink:* [Click here to view project](${project.permalinkUrl})
+        *Permalink:* [View Project](${project.permalinkUrl})
         *Last Modified:* ${project.lastModifiedAt}
-        
+
         *Project Members:*
         ${project.members.join("\n")}
-        
+
         *Project Followers:*
         ${project.followers.join("\n")}
-        
+
         *Tasks Overview:*
-        Completed: ${project.tasksOverview.completedTasks.length}
-        Pending: ${project.tasksOverview.pendingTasks.length}
-        Due: ${project.tasksOverview.dueTasks.length}
+        ✅ Completed: ${project.tasksOverview.completedTasks.length}
+        ⏳ Pending: ${project.tasksOverview.pendingTasks.length}
+        📅 Due: ${project.tasksOverview.dueTasks.length}
 
         *Task List:*
         ${tasksList}
         `;
 
-        // Ensure the correct Telex webhook URL format
-        const telexWebhookUrl = webHookUrl;
-
-        // Payload for Telex (Remove `data`)
+        // Payload for Telex (sending response to return_url)
         const payload = {
             event_name: "Asana Task Update",
-            message: message,  // The formatted message
+            message: message,
             status: "success",
             username: "AsanaBot"
         };
 
-        // Send POST request to Telex webhook
-        const telexResponse = await axios.post(telexWebhookUrl, payload);
-        console.log("Successfully sent notification to Telex:", telexResponse.data);
+        // Send response back to the return_url provided by Telex
+        await axios.post(return_url, payload);
+        console.log("Successfully sent response to Telex return_url:", return_url);
 
         // Ensure response is only sent once
         if (!res.headersSent) {
-            res.status(200).json({ message: "Tick processed & notification sent successfully" });
+            res.status(200).json({ message: "Tick processed & response sent to Telex" });
         }
 
     } catch (error) {
@@ -90,5 +88,5 @@ const processTick = async (req, res, next) => {
     }
 };
 
-// Export function
+// Export the function
 module.exports = { processTick };
