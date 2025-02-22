@@ -37,7 +37,7 @@ const integrationJson = (req, res) => {
           },
         ],
         tick_url: "https://asana-project-management.onrender.com/tick",
-        target_url: "https://asana-project-management.onrender.com",
+        target_url: "https://ping.telex.im/v1/webhooks/01952950-0004-7028-9256-9c29d654263a",
       },
     };
   

@@ -30,7 +30,7 @@ const getProjectDetails = async () => {
   }
 };
 
-// Helper function to get tasks for a project
+// Function to get tasks for a project
 const getTasksForProject = async () => {
   try {
     const response = await axios.get(`${asanaApiUrl}/projects/${projectGid}/tasks`, {
@@ -73,9 +73,13 @@ const getProjectAndTasks = async (req, res, next) => {
       })),
     };
 
-    // Send the combined and filtered response to the browser
-    res.status(200).json(responseData);
+    // If `res` exists (i.e., it's an API call), send the response to the client
+    if (res) {
+      res.status(200).json(responseData);
+    }
 
+    // Otherwise, return the data for internal use (cron job)
+    return responseData;
   } catch (err) {
     console.error("Error processing request:", err);
 
