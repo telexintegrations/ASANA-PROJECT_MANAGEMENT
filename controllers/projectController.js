@@ -52,7 +52,7 @@ const getTasksForProject = async () => {
 };
 
 // Get project details and tasks, then filter and send response
-const getProjectAndTasks = async (req, res, next) => {
+const getProjectAndTasks = async (req) => {
   try {
     // Fetch project details
     const projectData = await getProjectDetails();
@@ -60,11 +60,11 @@ const getProjectAndTasks = async (req, res, next) => {
     // Fetch tasks for the project
     const tasksData = await getTasksForProject();
     
-    // Filter the relevant details using the filter function for the project
+    // Filter the relevant details
     const filteredProjectDetails = filterProjectDetails(projectData, tasksData);
     
-    // Combine filtered project details and tasks (optional filtering done in the filter function)
-    const responseData = {
+    // Format the response data
+    return {
       project: filteredProjectDetails,
       tasks: tasksData.map(task => ({
         taskId: task.gid,
@@ -72,24 +72,14 @@ const getProjectAndTasks = async (req, res, next) => {
         resourceType: task.resource_type,
       })),
     };
-
-    // If `res` exists (i.e., it's an API call), send the response to the client
-    if (res) {
-      res.status(200).json(responseData);
-    }
-
-    // Otherwise, return the data for internal use (cron job)
-    return responseData;
   } catch (err) {
-    console.error("Error processing request:", err);
-
-    // If there's an error, pass the custom error object to the error handler
-    next({
-      statusCode: err.statusCode || constants.SERVER_ERROR,
-      message: err.message || "Something went wrong",
-    });
+    console.error("Error fetching project and tasks:", err);
+    
+    // Return `null` or throw an error instead of modifying `res`
+    return null;
   }
 };
+
 
 // Export the function to be used in the router
 module.exports = {getProjectAndTasks};
