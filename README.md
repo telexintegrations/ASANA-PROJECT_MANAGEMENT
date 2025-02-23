@@ -73,12 +73,6 @@ CRON_FALLBACK_INTERVAL=*/9 * * * *
   }
   ```
 
-## Error Handling
-This integration includes predefined error responses using HTTP status codes:
-- `400` - Missing required parameters
-- `404` - Resource not found
-- `500` - Internal server error
-
 ## Deployment
 To deploy the integration:
 1. Push your code to a GitHub repository under the `telex_integrations` org.
@@ -99,7 +93,4 @@ Below is a screenshot of the Asana-Telex integration in action:
 - Follow Git best practices.
 - Use meaningful commit messages.
 - Ensure code is well-documented.
-
-## License
-This project is licensed under the MIT License.
 
