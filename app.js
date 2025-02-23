@@ -7,7 +7,7 @@ const cronJob = require("./cronJob"); // Import and execute the cron job
 
 const app = express();
 
-const port = process.env.PORT;
+const port = process.env.PORT || 3000;
 
 // Middleware for handling CORS (allow cross-origin requests)
 app.use(cors({
