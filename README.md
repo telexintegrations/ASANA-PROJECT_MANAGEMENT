@@ -10,7 +10,7 @@ This project integrates Asana with Telex, enabling automatic updates from Asana 
 - Handles errors gracefully, ensuring reliability.
 
 ## Integration Type
-**Interval Integration**: Interval intergrations are integrations that send messages to a channel at set intervals.
+**Interval Integration**: Interval integrations are integrations that send messages to a channel at set intervals.
 
 ## Requirements
 - Node.js (v14 or later recommended)
@@ -48,24 +48,43 @@ CRON_FALLBACK_INTERVAL=*/9 * * * *
 ```
 
 ## Usage
-1. Send a `POST` request to `http://localhost:3000/tick` with the following JSON body:
-```json
-{
-  "return_url": "https://your-telex-webhook-url.com"
-}
-```
-2. The server will fetch Asana project data and send it to the specified `return_url`.
+1. **Telex will provide the `return_url`** in the body of the request when it triggers the integration.
+2. The server listens for a `POST` request at `/tick`. The `return_url` is dynamically extracted from the request body, and the response will be sent to this URL.
+   
+   When testing locally or simulating Telex requests, you can manually provide a `return_url` for testing purposes.
 
-## API Endpoints
-### **Process Tick**
-- **Endpoint:** `/tick`
-- **Method:** `POST`
-- **Payload:**
+### Example of Testing with Postman:
+- Send a `POST` request to `http://localhost:3000/tick` with the following JSON body:
   ```json
   {
     "return_url": "https://your-telex-webhook-url.com"
   }
   ```
+  Replace `"https://your-telex-webhook-url.com"` with a real URL where you want to test the response (e.g., Webhook.site for mock testing).
+
+### Example of `return_url` received in production:
+In production, Telex will send a `return_url` similar to this:
+```json
+{
+  "return_url": "https://ping.telex.im/v1/return/0195373c-9e03-74be-a5bf-744871fb3b6e"
+}
+```
+
+3. The server will fetch Asana project data, format it, and send it to the `return_url`.
+
+## API Endpoints
+
+### **Process Tick**
+- **Endpoint:** `/tick`
+- **Method:** `POST`
+- **Payload (Telex sends `return_url` dynamically):**
+  ```json
+  {
+    "return_url": "https://your-telex-webhook-url.com"
+  }
+  ```
+  - **Note:** In production, **Telex will provide the `return_url` dynamically**. This `return_url` is where the processed data will be sent.
+
 - **Response:**
   ```json
   {
@@ -83,6 +102,8 @@ To deploy the integration:
 - Test locally using `Postman` or `curl`.
 - Ensure the response is correctly formatted and sent to Telex.
 - Implement unit tests for reliability.
+  
+  **Note:** When testing locally, you can manually provide a mock `return_url` (e.g., via Webhook.site).
 
 ## Screenshots
 Below is a screenshot of the Asana-Telex integration in action:
@@ -94,3 +115,4 @@ Below is a screenshot of the Asana-Telex integration in action:
 - Use meaningful commit messages.
 - Ensure code is well-documented.
 
+---
